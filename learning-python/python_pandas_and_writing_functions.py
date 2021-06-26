@@ -43,6 +43,8 @@ WHAT IS PANDAS?
 ---------------
 
 """
+import pandas as pd
+
 # function 1: a basic calculation
 def calculate_birth_year(age):
     return 2021 - age
@@ -69,41 +71,51 @@ def main():
     # strings
     print("String section")
     x = "Hello world!"
-    print(type(x))
+    print(x, type(x))
     
     # integers
     print("Integer section")
     x = 1
-    print(type(x))
+    print(x, type(x))
     
     # floats
     print("Float section")
     x = 1.02
-    print(type(x))
+    print(x, type(x))
     
     # booleans
     print("Boolean section")
     x = True 
-    print(type(x))
+    print(x, type(x))
     
     # COLLECTIONS
     
     # lists - ordered, changeable, and allows duplicates
     print("List section")
     x = [1, 2, 4, 2, 4]
-    print(type(x))
+    print(x, type(x))
+    print(x, type(x))
     
     # sets - unordered, unchangeable, does not allow duplicates
     print("Set section")
     x = set(x)
-    print(type(x))
-    
+    print(x, type(x))
+    print(x, type(x))
+  
     # tuples - ordered, unchangeable, and allows duplicates
     print("Tuple section")
-    
+    x = (1, 2, 4, 2, 4)
+    print(x, type(x))
+    print(x, type(x))
     
     # dictionaries - ordered, changeable, does not allow duplicates
     print("Dictionary section")
+    x = {}
+    x["Jack"] = 24
+    x["John"] = 30
+    x["Jill"] = 50
+    print(x, type(x))
+    print(x, type(x))
     
     
     
