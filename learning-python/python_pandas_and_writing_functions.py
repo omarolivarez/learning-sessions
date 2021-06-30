@@ -49,14 +49,7 @@ import pandas as pd
 def calculate_birth_year(age):
     return 2021 - age
 
-# FUNCTIONS
-def main():
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("THE CODE BEGINS")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print()
+def practice_python():
     
     johns_age = 24 #yrs old
     janes_age = 64 #yrs old
@@ -116,9 +109,104 @@ def main():
     x["Jill"] = 50
     print(x, type(x))
     print(x, type(x))
+    return
+
+def add_quartile(x):
+    if x.perc <= 0.25:
+        return 1
+    elif x.perc > 0.25 and x.perc < 0.5:
+        return 2
+    elif x.perc > 0.5 and x.perc <= 0.75:
+        return 3
+    else:
+        return 4
+
+# FUNCTIONS
+def main():
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("THE CODE BEGINS")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print()
     
+    #practice_python() # this will run the function above
     
+    # PANDAS
+    # pandas cheat sheet: https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
+    # read in data
+    df = pd.read_csv("/Users/OmarOlivarez/Desktop/workspaces/learning-sessions/plip-r-visualizations/data/liwced_covid_dataset_6.9.21.csv")
+    # other useful reading parameters
+    #df = pd.read_csv("file_path", nrows=10) # if you only want to read in a few lines
+    #df = pd.read_csv("file_path", nrows=1).columns.tolist() # if you only want to read in column names
+    #df = pd.read_csv("file_path", usecols=cols_list) # to only read in certain columns
     
+    print(df.head())
+    print()
+    
+    print(df.columns) # this only prints the first and last ten
+    print()
+    print(list(df.columns)) # this lists out all the column names
+    print()
+    # let's look at HrsAroundOthers, social, and HrsTalking
+    
+    # first, let's get the correlation between HrsAroundOthers with social
+    subset = df[['HrsAroundOthers','social','HrsTalking']].copy()
+    print(subset.dtypes)
+    print("The correlation between HrsAroundOthers and social is:", round(subset['HrsAroundOthers'].corr(subset['social']), 4))
+    print("The correlation between HrsTalking and social is:", round(subset['HrsTalking'].corr(subset['social']), 4))
+    print()
+    
+    # let's make a new column for social time: HrsAroundOthers and HrsTalking
+    subset["SocialTime"] = subset.HrsAroundOthers + subset.HrsTalking
+    print(subset.head())
+    print()
+    
+    # there are a lot of NaNs! (the same as NAs in R). Let's remove them.
+    subset = subset.dropna()
+    print(subset.head())
+    print()
+    
+    # perfect! Now let's create a new column for the quartile that each row's SocialTime falls in
+    
+    # first let's add a new percentile rank column against Social Time
+    subset['perc'] = subset['SocialTime'].rank(pct=True)
+    
+    # now let's add in a new column for quartile
+    subset['quart'] = subset.apply(add_quartile, axis=1) 
+    
+    # let's take a look at the head again
+    print(subset.head())
+    print()
+    
+    # perfect, now let's get average social per quartile 
+    averaged_subset = subset.copy().groupby(by="quart").mean()
+    print("AVERAGE OF EACH COLUMN PER QUARTILE:")
+    print(averaged_subset.head())
+    print()
+    
+    # we only need quart and social, so let's only select those columns
+    simple_averaged_subset = averaged_subset[[ "social"]].copy()
+    print(simple_averaged_subset.head())
+    print()
+    
+    # now let's plot this as a barplot
+    # first, reset index (not necessary)
+    simple_averaged_subset = simple_averaged_subset.reset_index()
+    simple_averaged_subset.plot.bar(x = "quart", y = "social")
+    
+    # lastly, let's create a new df and merge it to this one
+    labels_df = pd.DataFrame( [["Not very social", 1], ["Slightly below avg social", 2], 
+                             ["Slight above average social", 3], ["Very social", 4] ],index=[1, 2, 3, 4], columns=['name', 'quart']) 
+    # name is for the first list, quartile is for the second
+    print(labels_df.head())
+    print()
+    
+    # now merge the data
+    merged_data = pd.merge(simple_averaged_subset, labels_df, how='left', on='quart')
+    print(merged_data.head())
+    print()
+
 main()
 
 
